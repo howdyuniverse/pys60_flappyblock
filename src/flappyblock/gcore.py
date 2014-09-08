@@ -90,13 +90,13 @@ class GameCore(object):
     #
     def load_bestscore(self):
         try:
-            data = open('pyFlappyBlock_score.txt', 'r')
+            data = open('C:\\pyFlappyBlock_score.txt', 'r')
             self.best_score = int(data.readline())
         except:
             pass
 
     def save_bestscore(self):
-        data = open('pyFlappyBlock_score.txt', 'w')
+        data = open('C:\\pyFlappyBlock_score.txt', 'w')
         data.write(unicode(self.score))
 
     def reset_game(self):
