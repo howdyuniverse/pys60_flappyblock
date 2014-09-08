@@ -1,3 +1,5 @@
+import key_codes
+
 import ggraphics
 
 import block
@@ -7,8 +9,8 @@ class GameCore(object):
     """ All game logic here """
 
     PIPE_SPEED = 2
-    BLOCK_FALLSPEED = 0.5
-    BLOCL_JUMPSPEED = 7
+    BLOCK_FALLSPEED = 1
+    BLOCK_JUMPSPEED = 15
 
     def __init__(self):
         self.graphics = ggraphics.GameGraphics()
@@ -30,7 +32,7 @@ class GameCore(object):
                             y=self.graphics.screen_size[1] / 2.,
                             size=blocksize,
                             fall_speed=self.BLOCK_FALLSPEED,
-                            jump_speed=self.BLOCL_JUMPSPEED)
+                            jump_speed=self.BLOCK_JUMPSPEED)
 
         self.pipewidth = blocksize * 2
         first_pipe = pairpipes.PairPipes(self.pipewidth,
@@ -46,6 +48,8 @@ class GameCore(object):
         second_pipe.move(-self.pipewidth*3.5)
         self.PIPES = [first_pipe, second_pipe]
 
+        self.graphics.canvas.bind(key_codes.EKey0, lambda: self.start_playing())
+
     def draw_scene(self):
         self.graphics.clear_buf()
         # (!) field_bottom var
@@ -53,7 +57,7 @@ class GameCore(object):
         # draw pipes
         for pipe in self.PIPES:
             self.graphics.draw_pipe(pipe.top_coords(), pipe.bottom_coords())
-        # draw playes block
+        # draw players block
         self.graphics.draw_block(self.block.coords())
 
         if not self.playing:
@@ -61,7 +65,7 @@ class GameCore(object):
 
         self.graphics.draw_score(unicode(self.score), unicode(self.best_score))
 
-        self.graphics.redraw()
+        
 
     def tick(self):
         self.draw_scene()
@@ -71,6 +75,8 @@ class GameCore(object):
             self.move_pipes()
             # pass pipes
             self.check_intersection()
+
+        self.graphics.redraw()
 
     def cancel(self):
         """ cancel all game flags/core loops """
@@ -106,22 +112,21 @@ class GameCore(object):
     def start_playing(self):
         self.playing = True
         self.reset_game()
-        # self.canvas.bind(key_codes.EKey0, lambda: None)
-        # self.canvas.bind(key_codes.EKey5, lambda: self.block.jump())
+        self.graphics.canvas.bind(key_codes.EKey0, lambda: None)
+        self.graphics.canvas.bind(key_codes.EKey5, lambda: self.block.jump())
 
     def stop_playing(self):
         self.playing = False
-        # self.canvas.bind(key_codes.EKey0, lambda: self.start_playing())
-        # self.canvas.bind(key_codes.EKey5, lambda: None)
+        self.graphics.canvas.bind(key_codes.EKey0, lambda: self.start_playing())
+        self.graphics.canvas.bind(key_codes.EKey5, lambda: None)
 
     def move_pipes(self):
         for pipe in self.PIPES:
             pipe.move(self.PIPE_SPEED)
 
     def check_intersection(self):
-        '''
-            Check intersection between Pipes and Player
-        '''
+        """ Check intersection between Pipes and Block
+        """
         for pipe in self.PIPES:
             if not pipe.is_passed():
                 # get block coords
@@ -136,6 +141,7 @@ class GameCore(object):
                 if pipe.top_coords()[2] < block_ltx:
                     self.score += 1
                     pipe.set_passed()
+
                 # check intercestions
                 if block_rby >= self.field_bottom:
                     self.stop_playing()

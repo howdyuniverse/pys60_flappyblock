@@ -6,7 +6,7 @@ import gcore
 class Game(object):
     """ Base game functionality for program """
 
-    INTERVAL = 0.08
+    INTERVAL = 0.02
 
     def __init__(self, screen_mode="full"):
         """ Constructor
